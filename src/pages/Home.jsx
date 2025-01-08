@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import Header from '../componets/Header'
 import { Link } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { fetchProducts } from '../redux/slice/productSlice'
 
 const Home = () => {
@@ -9,20 +9,44 @@ const Home = () => {
   useEffect(()=>{
     dispatch(fetchProducts())
   },[])
+
+  const {allProducts , loading , errorMsg} = useSelector(state=>state.productReducer)
+  console.log(allProducts,loading,errorMsg);
+  
   return (
     <>
     <Header insideHome={true}/>
 
     <div className='container px-4 mx-auto' style={{paddingTop:'100px'}}>
-        <div className='grid grid-cols-4 gap-4'>
-            <div className='rounded border p-2 shadow'>
-               <img style={{width:'100%'}} src="http://purepng.com/public/uploads/large/purepng.com-shopping-cartshoppingcarttrolleycarriagebuggysupermarkets-14215265323129kdoe.png" alt="" />
-               <div className='text-center'>
-                <h3 className='text-xl font-bold '>Product Name</h3>
-                <Link to={'/id/view'} className='bg-violet-600 rounded px-3 py-2 mt-3 text-white inline-block'>View More  </Link>
-               </div>
-            </div>
-        </div>
+        {
+          loading ? 
+          <div className='flex justify-center items-center my-5 text-lg'>
+            <img width={'70px'} height={'80px'} src="https://media1.tenor.com/images/d6cd5151c04765d1992edfde14483068/tenor.gif?itemid=5662595" alt="" />Loading </div>
+
+
+
+          :<>
+          <div className='grid grid-cols-4 gap-4'>
+          {
+            allProducts?.length>0?
+            allProducts?.map(product=>(
+              <div key={product?.id} className='rounded border p-2 shadow'>
+             <img style={{width:'100%'}} src={product?.thumbnail} alt="" />
+             <div className='text-center'>
+              <h3 className='text-xl font-bold '>{product?.title}</h3>
+              <Link to={`/${product?.id}/view`} className='bg-violet-600 rounded px-3 py-2 mt-3 text-white inline-block'>View More  </Link>
+             </div>
+          </div>
+            ))
+            :
+          
+           <div className='flex justify-center items-center font-bold text-red-600 my-5 text-lg'>
+            Product Not Found
+          </div>
+          }
+         </div>
+          </>
+        }
     </div>
     </>
   )
